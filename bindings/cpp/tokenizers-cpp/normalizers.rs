@@ -60,7 +60,7 @@ pub mod ffi {
         fn get_original(normalized: &NormalizedString) -> &str;
     }
 }
-
+use serde::{Deserialize, Serialize};
 use derive_more::{Deref, DerefMut};
 use tk::{
     normalizers::{
@@ -73,7 +73,7 @@ use tk::{
 #[derive(Deref, DerefMut)]
 pub struct NormalizedString(pub tk::NormalizedString);
 
-#[derive(Deref, DerefMut, Clone)]
+#[derive(Serialize, Deserialize, Deref, DerefMut, Clone)]
 pub struct Normalizer(pub tk::NormalizerWrapper);
 
 #[derive(Deref, DerefMut, Clone)]

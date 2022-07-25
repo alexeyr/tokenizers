@@ -101,6 +101,7 @@ mod ffi {
 }
 
 use crate::wrap_option;
+use serde::{Deserialize, Serialize};
 use derive_more::{Deref, DerefMut};
 use ffi::*;
 use tk::{
@@ -188,7 +189,7 @@ impl Encoding {
     }
 }
 
-#[derive(Deref, DerefMut, Clone)]
+#[derive(Serialize, Deserialize, Deref, DerefMut, Clone)]
 pub struct PostProcessor(pub PostProcessorWrapper);
 
 impl PostProcessorTrait for PostProcessor {

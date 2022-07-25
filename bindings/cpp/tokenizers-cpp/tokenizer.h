@@ -144,6 +144,15 @@ public:
     explicit Tokenizer(Model&& model) : inner_(ffi::tokenizer(*model)){};
 
     /**
+     * @brief Constructs a Tokenizer from a JSON file.
+     *
+     * @param path to the JSON file.
+     */
+    static Tokenizer from_file(const std::string& path) {
+        return Tokenizer(ffi::from_file(path));
+    }
+
+    /**
      * @brief Specifies the normalizer.
      */
     Tokenizer& with_normalizer(Normalizer&& normalizer) {

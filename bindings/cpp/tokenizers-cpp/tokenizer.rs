@@ -59,6 +59,7 @@ mod ffi {
 
         fn box_encoding1(encoding: &Encoding1) -> Box<Encoding1>;
 
+        fn from_file(path: &str) -> Result<Box<Tokenizer>>;
         // FIXME many of the below functions should take Box, not &.
         //  Look for clone() in the implementations.
         fn tokenizer(model: &Model) -> Box<Tokenizer>;
@@ -136,6 +137,7 @@ mod ffi {
 
 use crate::{forward_cxx_enum, impl_extern_type, models::vocab_to_vec, wrap_option};
 use cxx::CxxVector;
+use serde::{Serialize, Deserialize};
 use derive_more::{Deref, DerefMut};
 use ffi::*;
 use tk::{EncodeInput, PaddingParams, PaddingStrategy, Result, TruncationParams};
@@ -158,11 +160,18 @@ impl_extern_type!(PostProcessor, "huggingface::tokenizers::ffi::PostProcessor");
 
 impl_extern_type!(Decoder, "huggingface::tokenizers::ffi::Decoder");
 
-#[derive(Deref, DerefMut)]
+#[derive(Serialize, Deserialize, Deref, DerefMut)]
 struct Tokenizer(tk::TokenizerImpl<Model, Normalizer, PreTokenizer, PostProcessor, Decoder>);
 
 fn tokenizer(model: &Model) -> Box<Tokenizer> {
     Box::new(Tokenizer(tk::TokenizerImpl::new(model.clone())))
+}
+
+fn from_file(path: &str) -> Result<Box<Tokenizer>> {
+    match tk::TokenizerImpl::from_file(path) {
+        Ok(tokenizer) =>  Ok(Box::new(Tokenizer(tokenizer))),
+        Err(msg) => Err(msg)
+    }
 }
 
 fn set_normalizer(tokenizer: &mut Tokenizer, normalizer: &Normalizer) {

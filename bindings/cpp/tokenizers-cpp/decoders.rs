@@ -20,7 +20,7 @@ mod ffi {
         fn decode_decoder(decoder: &Decoder, tokens: Vec<String>) -> Result<String>;
     }
 }
-
+use serde::{Serialize, Deserialize};
 use derive_more::{Deref, DerefMut};
 use tk::{
     decoders::{bpe::BPEDecoder, byte_level::ByteLevel, wordpiece::WordPiece},
@@ -30,7 +30,7 @@ use tk::{
 
 use crate::pre_tokenizers::u32_to_char;
 
-#[derive(Deref, DerefMut, Clone)]
+#[derive(Serialize, Deserialize, Deref, DerefMut, Clone)]
 pub struct Decoder(pub DecoderWrapper);
 
 impl DecoderTrait for Decoder {

@@ -107,6 +107,7 @@ mod ffi {
 }
 
 use crate::{forward_cxx_enum, impl_extern_type, tokens::wrap_tokens_ref};
+use serde::{Deserialize, Serialize};
 use derive_more::{Deref, DerefMut};
 use ffi::*;
 use tk::{
@@ -131,7 +132,7 @@ impl_extern_type!(NormalizedString, "huggingface::tokenizers::ffi::NormalizedStr
 #[derive(Deref, DerefMut)]
 struct PreTokenizedString(tk::PreTokenizedString);
 
-#[derive(Deref, DerefMut, Clone)]
+#[derive(Serialize, Deserialize, Deref, DerefMut, Clone)]
 pub struct PreTokenizer(pub PreTokenizerWrapper);
 
 #[derive(Deref, DerefMut, Clone)]

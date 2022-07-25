@@ -49,6 +49,7 @@ fn main() {
             .includes(include_dirs)
             .flag_if_supported(format!("-std={}", &standard).as_str())
             .flag_if_supported(format!("/std:{}", &standard).as_str())
+            .flag_if_supported("-Wno-c++11-extensions")
             // enable exception handling for MSVC
             .flag_if_supported("/EHsc")
             .compile(output);
@@ -63,8 +64,14 @@ fn main() {
     if cfg!(feature = "test") {
         compile(
             cc::Build::new()
+                .cpp(true)
                 .file("tokenizers-cpp/redefine_result_tests.cpp")
-                .include(format!("{}/cxxbridge/include", out_dir)),
+                .include(format!("{}/cxxbridge/include", out_dir))
+                .flag_if_supported(format!("-std={}", &standard).as_str())
+                .flag_if_supported(format!("/std:{}", &standard).as_str())
+                .flag_if_supported("-Wno-c++11-extensions")
+                // enable exception handling for MSVC
+                .flag_if_supported("/EHsc"),
             "redefine_result_tests",
         );
     }

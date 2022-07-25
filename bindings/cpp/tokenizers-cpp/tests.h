@@ -360,6 +360,68 @@ TEST_SUITE("Tokenizers") {
         }
     }
 
+    void print_encoding(const Encoding& encoding) {
+        std::cout << "encoding length: " << encoding.length() << std:: endl;
+        std::cout << "encoding number of sequences: " << encoding.number_of_sequences() << std:: endl;
+        std::cout << "input_ids: ";
+        for (uint32_t id : encoding.get_ids()) {
+            std::cout << id << ' ';
+        }
+        std::cout << std::endl;
+
+        std::cout << "token_type_ids: ";
+        for (uint32_t attention_mask : encoding.get_type_ids()) {
+            std::cout << attention_mask << ' ';
+        }
+        std::cout << std::endl;
+
+        std::cout << "attention_mask: ";
+        for (uint32_t attention_mask : encoding.get_attention_mask()) {
+            std::cout << attention_mask << ' ';
+        }
+        std::cout << std::endl;
+    }
+
+
+    TEST_CASE("load tokenizer") {
+
+        SUBCASE("encode") {
+            Tokenizer tokenizer = Tokenizer::from_file(data_file("roberta.json"));
+            const char* example = "This is an example";
+            rust::Vec<uint32_t> ids{713, 16, 41, 1246};
+            std::vector<std::string> tokens{"This", "Ġis", "Ġan", "Ġexample"};
+
+            Encoding encodings = tokenizer.encode(InputSequence(example), false);
+
+            COMPARE_CONTAINERS(encodings.get_ids(), ids);
+            COMPARE_CONTAINERS(encodings.get_tokens(), tokens);
+
+            rust::String decoded = tokenizer.decode(ids, false);
+            CHECK(decoded == example);
+        }
+
+        SUBCASE("encode_batch") {
+            std::vector<std::string> examples {
+                "This is an example",
+                "hello world"
+            };
+            std::vector<InputSequence> batch;
+            for (const auto& input : examples) {
+                batch.emplace_back(input.c_str());
+            }
+            Tokenizer tokenizer = Tokenizer::from_file(data_file("roberta.json"));
+            auto encodings = tokenizer
+                .with_padding(PaddingParams().with_batch_longest())
+                .encode_batch(batch);
+            for (auto const&encoding : encodings) {
+                // print_encoding(encoding);
+                CHECK(encoding.get_ids().size() == 4);
+                CHECK(encoding.get_type_ids().size() == 4);
+                CHECK(encoding.get_attention_mask().size() == 4);
+            }
+        }
+    }
+
     TEST_CASE("Bert") {
         Tokenizer tokenizer(WordPieceBuilder()
                                 .files(bert_vocab())

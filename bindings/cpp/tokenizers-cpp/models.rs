@@ -99,7 +99,7 @@ use std::{
     collections::HashMap,
     path::{Path, PathBuf},
 };
-
+use serde::{Deserialize, Serialize};
 use crate::{tokens::wrap_tokens, wrap_option};
 use derive_more::{Deref, DerefMut};
 use ffi::*;
@@ -112,7 +112,7 @@ use tk::{
     Model as ModelTrait, ModelWrapper, Result, Trainer as TrainerTrait,
 };
 
-#[derive(Deref, DerefMut, Clone)]
+#[derive(Serialize, Deserialize, Deref, DerefMut, Clone)]
 pub struct Model(pub ModelWrapper);
 
 #[derive(Deref, DerefMut)]
